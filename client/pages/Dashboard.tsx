@@ -29,21 +29,32 @@ export default function Dashboard() {
         if (locationFilter) params.append("location", locationFilter);
         if (jobTypeFilter) params.append("employment_type", jobTypeFilter);
 
-        const response = await fetch(
-          `/api/jobs/search?${params.toString() || "query=developer"}`
-        );
+        const url = `/api/jobs/search?${params.toString() || "query=developer"}`;
+        console.log("Fetching jobs from:", url);
+
+        const response = await fetch(url);
 
         if (!response.ok) {
-          throw new Error("Failed to fetch jobs");
+          const errorData = await response.json().catch(() => ({}));
+          console.error("API Error Response:", {
+            status: response.status,
+            statusText: response.statusText,
+            data: errorData,
+          });
+          throw new Error(
+            errorData.error ||
+              `Failed to fetch jobs (${response.status}: ${response.statusText})`
+          );
         }
 
         const data: JobsResponse = await response.json();
+        console.log("Jobs fetched successfully:", data.jobs?.length || 0);
         setJobs(data.jobs || []);
       } catch (err) {
-        console.error("Error fetching jobs:", err);
-        setError(
-          err instanceof Error ? err.message : "Failed to load jobs. Please try again."
-        );
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to load jobs. Please try again.";
+        console.error("Error fetching jobs:", errorMessage, err);
+        setError(errorMessage);
         setJobs([]);
       } finally {
         setLoading(false);
