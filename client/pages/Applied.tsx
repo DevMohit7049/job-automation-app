@@ -15,10 +15,10 @@ export default function Applied() {
 
   useEffect(() => {
     const applicationsMap = getApplicationsMap();
-    const jobs: AppliedJob[] = Array.from(applicationsMap.values())
-      .sort((a: any, b: any) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+    const jobs: AppliedJob[] = Array.from(applicationsMap.values()).sort(
+      (a: any, b: any) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
     setAppliedJobs(jobs);
   }, []);
 
@@ -95,7 +95,7 @@ export default function Applied() {
     const applicationsMap = getApplicationsMap();
     applicationsMap.delete(jobId);
     saveApplicationsMap(applicationsMap);
-    setAppliedJobs(appliedJobs.filter(job => job.jobId !== jobId));
+    setAppliedJobs(appliedJobs.filter((job) => job.jobId !== jobId));
   };
 
   return (

@@ -1,6 +1,6 @@
-export type ActivityType = 
-  | "job_applied" 
-  | "job_reviewed" 
+export type ActivityType =
+  | "job_applied"
+  | "job_reviewed"
   | "job_not_interested"
   | "search_performed"
   | "filter_applied";
@@ -19,7 +19,7 @@ const APPLICATIONS_KEY = "job_applications";
 export function logActivity(
   type: ActivityType,
   details: Record<string, any>,
-  description: string
+  description: string,
 ): Activity {
   const activity: Activity = {
     id: `activity-${Date.now()}`,

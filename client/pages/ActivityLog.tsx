@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
-import { Activity, getActivityLogs, clearActivityLogs, formatActivityTime } from "@/lib/logger";
+import {
+  Activity,
+  getActivityLogs,
+  clearActivityLogs,
+  formatActivityTime,
+} from "@/lib/logger";
 import { CheckCircle2, Eye, Trash2, Search, Zap, Trash } from "lucide-react";
 
 export default function ActivityLog() {
@@ -15,7 +20,7 @@ export default function ActivityLog() {
   const handleClearAll = () => {
     if (
       window.confirm(
-        "Are you sure you want to clear all activity logs? This cannot be undone."
+        "Are you sure you want to clear all activity logs? This cannot be undone.",
       )
     ) {
       clearActivityLogs();
@@ -64,11 +69,13 @@ export default function ActivityLog() {
   const activityCounts = {
     job_applied: activities.filter((a) => a.type === "job_applied").length,
     job_reviewed: activities.filter((a) => a.type === "job_reviewed").length,
-    job_not_interested: activities.filter((a) => a.type === "job_not_interested")
-      .length,
+    job_not_interested: activities.filter(
+      (a) => a.type === "job_not_interested",
+    ).length,
     search_performed: activities.filter((a) => a.type === "search_performed")
       .length,
-    filter_applied: activities.filter((a) => a.type === "filter_applied").length,
+    filter_applied: activities.filter((a) => a.type === "filter_applied")
+      .length,
   };
 
   return (
@@ -119,7 +126,9 @@ export default function ActivityLog() {
                   <p className="text-2xl font-bold text-destructive">
                     {activityCounts.job_not_interested}
                   </p>
-                  <p className="text-xs text-muted-foreground">Not Interested</p>
+                  <p className="text-xs text-muted-foreground">
+                    Not Interested
+                  </p>
                 </div>
                 <div className="bg-card border border-border rounded-lg p-3">
                   <p className="text-2xl font-bold text-accent">
@@ -182,7 +191,7 @@ export default function ActivityLog() {
                     <div
                       key={activity.id}
                       className={`border rounded-lg p-4 animate-slide-in ${getActivityColor(
-                        activity.type
+                        activity.type,
                       )}`}
                     >
                       <div className="flex items-start gap-4">

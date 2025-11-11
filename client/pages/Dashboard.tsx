@@ -4,12 +4,16 @@ import { JobCard } from "@/components/JobCard";
 import { FilterBar } from "@/components/FilterBar";
 import { Job, Application, JobsResponse } from "@shared/api";
 import { Briefcase, Loader2 } from "lucide-react";
-import { logActivity, getApplicationsMap, saveApplicationsMap } from "@/lib/logger";
+import {
+  logActivity,
+  getApplicationsMap,
+  saveApplicationsMap,
+} from "@/lib/logger";
 
 export default function Dashboard() {
   const [jobs, setJobs] = useState<Job[]>([]);
-  const [applications, setApplications] = useState<Map<string, Application>>(() =>
-    getApplicationsMap()
+  const [applications, setApplications] = useState<Map<string, Application>>(
+    () => getApplicationsMap(),
   );
   const [loading, setLoading] = useState(true);
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
@@ -54,7 +58,7 @@ export default function Dashboard() {
           });
           throw new Error(
             errorData.error ||
-              `Failed to fetch jobs (${response.status}: ${response.statusText})`
+              `Failed to fetch jobs (${response.status}: ${response.statusText})`,
           );
         }
 
@@ -63,7 +67,9 @@ export default function Dashboard() {
         setJobs(data.jobs || []);
       } catch (err) {
         const errorMessage =
-          err instanceof Error ? err.message : "Failed to load jobs. Please try again.";
+          err instanceof Error
+            ? err.message
+            : "Failed to load jobs. Please try again.";
         console.error("Error fetching jobs:", errorMessage, err);
         setError(errorMessage);
         setJobs([]);
@@ -84,19 +90,19 @@ export default function Dashboard() {
       filtered = filtered.filter(
         (job) =>
           job.title.toLowerCase().includes(query) ||
-          job.company.toLowerCase().includes(query)
+          job.company.toLowerCase().includes(query),
       );
     }
 
     if (roleFilter) {
       filtered = filtered.filter((job) =>
-        job.title.toLowerCase().includes(roleFilter.toLowerCase())
+        job.title.toLowerCase().includes(roleFilter.toLowerCase()),
       );
     }
 
     if (locationFilter) {
       filtered = filtered.filter((job) =>
-        job.location.toLowerCase().includes(locationFilter.toLowerCase())
+        job.location.toLowerCase().includes(locationFilter.toLowerCase()),
       );
     }
 
@@ -109,10 +115,17 @@ export default function Dashboard() {
     }
 
     setFilteredJobs(filtered);
-  }, [jobs, searchQuery, roleFilter, locationFilter, jobTypeFilter, workModeFilter]);
+  }, [
+    jobs,
+    searchQuery,
+    roleFilter,
+    locationFilter,
+    jobTypeFilter,
+    workModeFilter,
+  ]);
 
   const handleMarkReviewed = (jobId: string) => {
-    const job = jobs.find(j => j.id === jobId);
+    const job = jobs.find((j) => j.id === jobId);
     const newApp: Application = {
       id: `app-${jobId}`,
       jobId,
@@ -128,12 +141,12 @@ export default function Dashboard() {
     logActivity(
       "job_reviewed",
       { jobId, jobTitle: job?.title, company: job?.company },
-      `Reviewed job: ${job?.title} at ${job?.company}`
+      `Reviewed job: ${job?.title} at ${job?.company}`,
     );
   };
 
   const handleApply = (jobId: string) => {
-    const job = jobs.find(j => j.id === jobId);
+    const job = jobs.find((j) => j.id === jobId);
     const newApp: Application = {
       id: `app-${jobId}`,
       jobId,
@@ -149,13 +162,18 @@ export default function Dashboard() {
     saveApplicationsMap(newApplications);
     logActivity(
       "job_applied",
-      { jobId, jobTitle: job?.title, company: job?.company, location: job?.location },
-      `✅ Applied to job: ${job?.title} at ${job?.company}`
+      {
+        jobId,
+        jobTitle: job?.title,
+        company: job?.company,
+        location: job?.location,
+      },
+      `✅ Applied to job: ${job?.title} at ${job?.company}`,
     );
   };
 
   const handleNotInterested = (jobId: string) => {
-    const job = jobs.find(j => j.id === jobId);
+    const job = jobs.find((j) => j.id === jobId);
     const newApp: Application = {
       id: `app-${jobId}`,
       jobId,
@@ -171,7 +189,7 @@ export default function Dashboard() {
     logActivity(
       "job_not_interested",
       { jobId, jobTitle: job?.title, company: job?.company },
-      `Marked as not interested: ${job?.title} at ${job?.company}`
+      `Marked as not interested: ${job?.title} at ${job?.company}`,
     );
   };
 

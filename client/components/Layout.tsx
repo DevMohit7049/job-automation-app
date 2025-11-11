@@ -1,6 +1,15 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Briefcase, CheckCircle2, Zap, Settings, Moon, Sun, Menu, X } from "lucide-react";
+import {
+  Briefcase,
+  CheckCircle2,
+  Zap,
+  Settings,
+  Moon,
+  Sun,
+  Menu,
+  X,
+} from "lucide-react";
 import { useState, ReactNode } from "react";
 
 interface LayoutProps {
@@ -149,9 +158,7 @@ export function Layout({ children }: LayoutProps) {
         </div>
 
         {/* Page Content */}
-        <div className="flex-1 overflow-auto">
-          {children}
-        </div>
+        <div className="flex-1 overflow-auto">{children}</div>
       </div>
 
       {/* Mobile Sidebar Overlay */}
