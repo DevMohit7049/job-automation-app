@@ -51,7 +51,15 @@ export const handleSearchJobs: RequestHandler = async (req, res) => {
     );
 
     if (!response.ok) {
-      throw new Error(`JSearch API error: ${response.statusText}`);
+      const errorText = await response.text();
+      console.error("JSearch API Error:", {
+        status: response.status,
+        statusText: response.statusText,
+        body: errorText,
+      });
+      throw new Error(
+        `JSearch API error (${response.status}): ${response.statusText}`
+      );
     }
 
     const data: JSearchResponse = await response.json();
