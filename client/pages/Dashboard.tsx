@@ -94,8 +94,12 @@ export default function Dashboard() {
       filtered = filtered.filter((job) => job.jobType === jobTypeFilter);
     }
 
+    if (workModeFilter) {
+      filtered = filtered.filter((job) => job.workMode === workModeFilter);
+    }
+
     setFilteredJobs(filtered);
-  }, [jobs, searchQuery, roleFilter, locationFilter, jobTypeFilter]);
+  }, [jobs, searchQuery, roleFilter, locationFilter, jobTypeFilter, workModeFilter]);
 
   const handleMarkReviewed = (jobId: string) => {
     const newApp: Application = {
@@ -160,6 +164,7 @@ export default function Dashboard() {
           onRoleChange={setRoleFilter}
           onLocationChange={setLocationFilter}
           onJobTypeChange={setJobTypeFilter}
+          onWorkModeChange={setWorkModeFilter}
         />
 
         {/* Jobs Content */}
