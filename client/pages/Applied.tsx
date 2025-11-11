@@ -1,44 +1,46 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { CheckCircle2, AlertCircle, ExternalLink, Trash2 } from "lucide-react";
+import { Application } from "@shared/api";
+import { getApplicationsMap, saveApplicationsMap } from "@/lib/logger";
 
-interface AppliedJob {
-  id: string;
-  jobId: string;
+interface AppliedJob extends Application {
   title: string;
   company: string;
-  status: "Applied" | "Pending" | "External";
-  appliedAt: string;
   location: string;
 }
 
 export default function Applied() {
-  const [appliedJobs] = useState<AppliedJob[]>([
-    {
-      id: "1",
-      jobId: "1",
-      title: "Senior React Developer",
-      company: "TechCorp",
-      status: "Applied",
-      appliedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-      location: "San Francisco, CA",
-    },
-    {
-      id: "2",
-      jobId: "3",
-      title: "Full Stack Developer",
-      company: "StartupXYZ",
-      status: "External",
-      appliedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-      location: "Austin, TX",
-    },
-  ]);
+  const [appliedJobs, setAppliedJobs] = useState<AppliedJob[]>([]);
+
+  useEffect(() => {
+    const applicationsMap = getApplicationsMap();
+    const jobs: AppliedJob[] = Array.from(applicationsMap.values()).sort(
+      (a: any, b: any) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+    setAppliedJobs(jobs);
+  }, []);
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+
+    return date.toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -49,21 +51,35 @@ export default function Applied() {
           icon: CheckCircle2,
           color: "text-success",
           bg: "bg-success/10",
-          label: "Applied",
+          label: "✅ Applied",
+        };
+      case "Reviewed":
+        return {
+          icon: CheckCircle2,
+          color: "text-primary",
+          bg: "bg-primary/10",
+          label: "👁️ Reviewed",
         };
       case "Pending":
         return {
           icon: AlertCircle,
           color: "text-warning",
           bg: "bg-warning/10",
-          label: "Pending",
+          label: "⏳ Pending",
         };
       case "External":
         return {
           icon: ExternalLink,
           color: "text-accent",
           bg: "bg-accent/10",
-          label: "External Site",
+          label: "🔗 External",
+        };
+      case "Not Interested":
+        return {
+          icon: AlertCircle,
+          color: "text-destructive",
+          bg: "bg-destructive/10",
+          label: "❌ Not Interested",
         };
       default:
         return {
@@ -73,6 +89,13 @@ export default function Applied() {
           label: status,
         };
     }
+  };
+
+  const handleDelete = (jobId: string) => {
+    const applicationsMap = getApplicationsMap();
+    applicationsMap.delete(jobId);
+    saveApplicationsMap(applicationsMap);
+    setAppliedJobs(appliedJobs.filter((job) => job.jobId !== jobId));
   };
 
   return (
@@ -125,10 +148,17 @@ export default function Applied() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <button className="p-2 hover:bg-secondary rounded-lg transition-colors text-muted-foreground hover:text-foreground">
+                        <button
+                          className="p-2 hover:bg-secondary rounded-lg transition-colors text-muted-foreground hover:text-foreground"
+                          title="View job details"
+                        >
                           <ExternalLink className="w-4 h-4" />
                         </button>
-                        <button className="p-2 hover:bg-destructive/10 rounded-lg transition-colors text-muted-foreground hover:text-destructive">
+                        <button
+                          onClick={() => handleDelete(job.jobId)}
+                          className="p-2 hover:bg-destructive/10 rounded-lg transition-colors text-muted-foreground hover:text-destructive"
+                          title="Remove from applications"
+                        >
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>

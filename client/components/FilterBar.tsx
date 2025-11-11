@@ -6,6 +6,7 @@ interface FilterBarProps {
   onRoleChange: (role: string) => void;
   onLocationChange: (location: string) => void;
   onJobTypeChange: (jobType: string) => void;
+  onWorkModeChange?: (workMode: string) => void;
 }
 
 export function FilterBar({
@@ -13,12 +14,14 @@ export function FilterBar({
   onRoleChange,
   onLocationChange,
   onJobTypeChange,
+  onWorkModeChange,
 }: FilterBarProps) {
   const [search, setSearch] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [role, setRole] = useState("");
-  const [location, setLocation] = useState("");
+  const [location, setLocation] = useState("India");
   const [jobType, setJobType] = useState("");
+  const [workMode, setWorkMode] = useState("");
 
   const handleSearchChange = (value: string) => {
     setSearch(value);
@@ -40,17 +43,24 @@ export function FilterBar({
     onJobTypeChange(value);
   };
 
-  const hasActiveFilters = search || role || location || jobType;
+  const handleWorkModeChange = (value: string) => {
+    setWorkMode(value);
+    onWorkModeChange?.(value);
+  };
+
+  const hasActiveFilters = search || role || location || jobType || workMode;
 
   const clearFilters = () => {
     setSearch("");
     setRole("");
-    setLocation("");
+    setLocation("India");
     setJobType("");
+    setWorkMode("");
     onSearchChange("");
     onRoleChange("");
-    onLocationChange("");
+    onLocationChange("India");
     onJobTypeChange("");
+    onWorkModeChange?.("");
   };
 
   return (
@@ -96,7 +106,7 @@ export function FilterBar({
 
       {/* Filter Panel */}
       {showFilters && (
-        <div className="px-6 py-4 border-t border-border grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="px-6 py-4 border-t border-border grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Role Filter */}
           <div>
             <label className="block text-sm font-medium text-card-foreground mb-2">
@@ -116,13 +126,37 @@ export function FilterBar({
             <label className="block text-sm font-medium text-card-foreground mb-2">
               Location
             </label>
-            <input
-              type="text"
-              placeholder="e.g., New York"
+            <select
               value={location}
               onChange={(e) => handleLocationChange(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg bg-secondary border border-input text-card-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-            />
+              className="w-full px-4 py-2 rounded-lg bg-secondary border border-input text-card-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all appearance-none cursor-pointer"
+            >
+              <option value="India">India</option>
+              <option value="United States">United States</option>
+              <option value="United Kingdom">United Kingdom</option>
+              <option value="Canada">Canada</option>
+              <option value="Australia">Australia</option>
+              <option value="Germany">Germany</option>
+              <option value="Singapore">Singapore</option>
+              <option value="Dubai">Dubai</option>
+            </select>
+          </div>
+
+          {/* Work Mode Filter */}
+          <div>
+            <label className="block text-sm font-medium text-card-foreground mb-2">
+              Work Mode
+            </label>
+            <select
+              value={workMode}
+              onChange={(e) => handleWorkModeChange(e.target.value)}
+              className="w-full px-4 py-2 rounded-lg bg-secondary border border-input text-card-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all appearance-none cursor-pointer"
+            >
+              <option value="">All Modes</option>
+              <option value="Remote">Remote</option>
+              <option value="On-site">On-site</option>
+              <option value="Hybrid">Hybrid</option>
+            </select>
           </div>
 
           {/* Job Type Filter */}
