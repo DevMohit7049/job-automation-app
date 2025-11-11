@@ -26,11 +26,20 @@ export default function Dashboard() {
         setError(null);
 
         const params = new URLSearchParams();
-        if (roleFilter) params.append("query", roleFilter);
-        if (locationFilter) params.append("location", locationFilter);
+
+        // Build query combining role and location for better India job search
+        let query = roleFilter || "developer";
+        if (locationFilter && locationFilter !== "India") {
+          params.append("location", locationFilter);
+        } else if (locationFilter === "India") {
+          // For India searches, include it in the query string for better results
+          query = query + " india";
+        }
+
+        params.append("query", query);
         if (jobTypeFilter) params.append("employment_type", jobTypeFilter);
 
-        const url = `/api/jobs/search?${params.toString() || "query=developer"}`;
+        const url = `/api/jobs/search?${params.toString()}`;
         console.log("Fetching jobs from:", url);
 
         const response = await fetch(url);
