@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Briefcase, CheckCircle2, Zap, Settings, Moon, Sun, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useState, ReactNode } from "react";
 
 interface LayoutProps {
   children: ReactNode;
