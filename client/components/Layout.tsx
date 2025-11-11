@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Briefcase, CheckCircle2, Settings, Moon, Sun, Menu, X } from "lucide-react";
+import { Briefcase, CheckCircle2, Zap, Settings, Moon, Sun, Menu, X } from "lucide-react";
 import { useState } from "react";
 
 interface LayoutProps {
@@ -24,6 +24,12 @@ export function Layout({ children }: LayoutProps) {
       label: "Applied Jobs",
       icon: CheckCircle2,
       active: location.pathname === "/applied",
+    },
+    {
+      href: "/activity-log",
+      label: "Activity Log",
+      icon: Zap,
+      active: location.pathname === "/activity-log",
     },
     {
       href: "/settings",
