@@ -14,8 +14,9 @@ export default function Dashboard() {
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
-  const [locationFilter, setLocationFilter] = useState("");
+  const [locationFilter, setLocationFilter] = useState("India");
   const [jobTypeFilter, setJobTypeFilter] = useState("");
+  const [workModeFilter, setWorkModeFilter] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -62,7 +63,7 @@ export default function Dashboard() {
     };
 
     fetchJobs();
-  }, [roleFilter, locationFilter, jobTypeFilter]);
+  }, [roleFilter, locationFilter, jobTypeFilter, workModeFilter]);
 
   // Filter jobs based on search and filters
   useEffect(() => {
