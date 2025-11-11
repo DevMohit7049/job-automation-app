@@ -4,11 +4,12 @@ import { JobCard } from "@/components/JobCard";
 import { FilterBar } from "@/components/FilterBar";
 import { Job, Application, JobsResponse } from "@shared/api";
 import { Briefcase, Loader2 } from "lucide-react";
+import { logActivity, getApplicationsMap, saveApplicationsMap } from "@/lib/logger";
 
 export default function Dashboard() {
   const [jobs, setJobs] = useState<Job[]>([]);
-  const [applications, setApplications] = useState<Map<string, Application>>(
-    new Map()
+  const [applications, setApplications] = useState<Map<string, Application>>(() =>
+    getApplicationsMap()
   );
   const [loading, setLoading] = useState(true);
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
@@ -111,6 +112,7 @@ export default function Dashboard() {
   }, [jobs, searchQuery, roleFilter, locationFilter, jobTypeFilter, workModeFilter]);
 
   const handleMarkReviewed = (jobId: string) => {
+    const job = jobs.find(j => j.id === jobId);
     const newApp: Application = {
       id: `app-${jobId}`,
       jobId,
@@ -122,9 +124,16 @@ export default function Dashboard() {
     const newApplications = new Map(applications);
     newApplications.set(jobId, newApp);
     setApplications(newApplications);
+    saveApplicationsMap(newApplications);
+    logActivity(
+      "job_reviewed",
+      { jobId, jobTitle: job?.title, company: job?.company },
+      `Reviewed job: ${job?.title} at ${job?.company}`
+    );
   };
 
   const handleApply = (jobId: string) => {
+    const job = jobs.find(j => j.id === jobId);
     const newApp: Application = {
       id: `app-${jobId}`,
       jobId,
@@ -137,9 +146,16 @@ export default function Dashboard() {
     const newApplications = new Map(applications);
     newApplications.set(jobId, newApp);
     setApplications(newApplications);
+    saveApplicationsMap(newApplications);
+    logActivity(
+      "job_applied",
+      { jobId, jobTitle: job?.title, company: job?.company, location: job?.location },
+      `✅ Applied to job: ${job?.title} at ${job?.company}`
+    );
   };
 
   const handleNotInterested = (jobId: string) => {
+    const job = jobs.find(j => j.id === jobId);
     const newApp: Application = {
       id: `app-${jobId}`,
       jobId,
@@ -151,6 +167,12 @@ export default function Dashboard() {
     const newApplications = new Map(applications);
     newApplications.set(jobId, newApp);
     setApplications(newApplications);
+    saveApplicationsMap(newApplications);
+    logActivity(
+      "job_not_interested",
+      { jobId, jobTitle: job?.title, company: job?.company },
+      `Marked as not interested: ${job?.title} at ${job?.company}`
+    );
   };
 
   return (
