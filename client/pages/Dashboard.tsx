@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { JobCard } from "@/components/JobCard";
 import { FilterBar } from "@/components/FilterBar";
-import { Job, Application } from "@shared/api";
+import { Job, Application, JobsResponse } from "@shared/api";
 import { Briefcase, Loader2 } from "lucide-react";
 
 export default function Dashboard() {
@@ -16,77 +16,42 @@ export default function Dashboard() {
   const [roleFilter, setRoleFilter] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
   const [jobTypeFilter, setJobTypeFilter] = useState("");
-
-  // Mock data - in production, fetch from API
-  const mockJobs: Job[] = [
-    {
-      id: "1",
-      title: "Senior React Developer",
-      company: "TechCorp",
-      location: "San Francisco, CA",
-      jobType: "Full-time",
-      workMode: "Remote",
-      postedTime: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-      jobLink: "https://linkedin.com/jobs/1",
-      applyLink: "https://linkedin.com/jobs/1/apply",
-      description:
-        "We are looking for a senior React developer with 5+ years of experience. Strong knowledge of TypeScript, state management, and testing frameworks required.",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: "2",
-      title: "DevOps Engineer",
-      company: "CloudInnovate",
-      location: "New York, NY",
-      jobType: "Full-time",
-      workMode: "Hybrid",
-      postedTime: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-      jobLink: "https://linkedin.com/jobs/2",
-      applyLink: "https://linkedin.com/jobs/2/apply",
-      description:
-        "Looking for experienced DevOps engineer to manage our cloud infrastructure. Kubernetes, Docker, and CI/CD pipeline experience essential.",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: "3",
-      title: "Full Stack Developer",
-      company: "StartupXYZ",
-      location: "Austin, TX",
-      jobType: "Full-time",
-      workMode: "On-site",
-      postedTime: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-      jobLink: "https://linkedin.com/jobs/3",
-      description:
-        "Seeking talented full-stack developer proficient in React, Node.js, and PostgreSQL. Join our fast-growing startup.",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      isExternal: true,
-    },
-    {
-      id: "4",
-      title: "Frontend Developer",
-      company: "DesignStudio",
-      location: "Los Angeles, CA",
-      jobType: "Part-time",
-      workMode: "Remote",
-      postedTime: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-      jobLink: "https://linkedin.com/jobs/4",
-      description:
-        "Creative frontend developer needed for our design-focused projects. Experience with CSS-in-JS and animation libraries preferred.",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-  ];
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simulate fetching jobs
-    setTimeout(() => {
-      setJobs(mockJobs);
-      setLoading(false);
-    }, 500);
-  }, []);
+    const fetchJobs = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const params = new URLSearchParams();
+        if (roleFilter) params.append("query", roleFilter);
+        if (locationFilter) params.append("location", locationFilter);
+        if (jobTypeFilter) params.append("employment_type", jobTypeFilter);
+
+        const response = await fetch(
+          `/api/jobs/search?${params.toString() || "query=developer"}`
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch jobs");
+        }
+
+        const data: JobsResponse = await response.json();
+        setJobs(data.jobs || []);
+      } catch (err) {
+        console.error("Error fetching jobs:", err);
+        setError(
+          err instanceof Error ? err.message : "Failed to load jobs. Please try again."
+        );
+        setJobs([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, [roleFilter, locationFilter, jobTypeFilter]);
 
   // Filter jobs based on search and filters
   useEffect(() => {
@@ -192,6 +157,22 @@ export default function Dashboard() {
               <div className="flex flex-col items-center gap-4">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
                 <p className="text-muted-foreground">Loading jobs...</p>
+              </div>
+            </div>
+          ) : error ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center">
+                <Briefcase className="w-12 h-12 text-red-400 mx-auto mb-4 opacity-50" />
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  Error loading jobs
+                </h3>
+                <p className="text-muted-foreground mb-4">{error}</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
+                >
+                  Retry
+                </button>
               </div>
             </div>
           ) : filteredJobs.length > 0 ? (
